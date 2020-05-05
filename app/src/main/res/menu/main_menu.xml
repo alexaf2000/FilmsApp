@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/ic_filter_filled_tool_symbol_svgrepo_com"
+        android:id="@+id/filterButton"
+        android:title="Filtrar"
+        app:showAsAction="always"
+        android:iconTint="#fff"
+        android:tint="#fff"
+        />
+</menu>
