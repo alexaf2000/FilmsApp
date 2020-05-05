@@ -40,6 +40,7 @@ public class dbFilm extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" + KEY_ID + " TEXT PRIMARY KEY, " + KEY_TITLE + " TEXT, " + KEY_GENRE + " TEXT, " + KEY_DURATION + " INTEGER," + KEY_PUNTUATION + " INTEGER, " + KEY_COVER + " TEXT"  + ")";
         db.execSQL(CREATE_TABLE);
+
     }
 
     @Override
@@ -104,7 +105,7 @@ public class dbFilm extends SQLiteOpenHelper {
 
             } while (cursor.moveToNext());
         }
-
+        db.close();
         return filmsList;
 
     }

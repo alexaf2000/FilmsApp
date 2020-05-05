@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, filmsAdapter.ItemClickListener {
     // Visual components assignation
 
     FloatingActionButton floatingActionButton;
@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     GridLayoutManager layoutManager;
     dbFilm film_db;
+    ArrayList<HashMap<String, String>> filmsDataSet;
     List<Film> filmsList;
 
 
@@ -94,24 +95,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         filmsList = film_db.getAllFilms();
 
         HashMap<String, String> hashMap;
-        ArrayList<HashMap<String, String>> films = new ArrayList<HashMap<String, String>>();
+        filmsDataSet = new ArrayList<HashMap<String, String>>();
 
         for (Film film : filmsList) {
+            String id = film.getId();
             String title = film.getTitle();
             String cover = film.getCover().toString();
 
 
             //Afegim la clau valor a un objecte de tipus Hashmap
             hashMap = new HashMap<String, String>();
+            hashMap.put("id", id);
             hashMap.put("title", title);
             hashMap.put("cover", cover);
 
-            films.add(hashMap);
+            filmsDataSet.add(hashMap);
         }
 
         // Especifica el adaptador a fer servir
-        filmsAdapter mAdapter = new filmsAdapter(MainActivity.this, films);
-        //mAdapter.setClickListener(MainActivity.this);
+        filmsAdapter mAdapter = new filmsAdapter(MainActivity.this, filmsDataSet);
+        mAdapter.setClickListener(this);
 
         filmsRecyclerView.setAdapter(mAdapter);
 
@@ -126,5 +129,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
                 break;
         }
+    }
+
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Toast.makeText(this, "Contenido: "+filmsDataSet.get(position).get("id"), Toast.LENGTH_SHORT).show();
     }
 }
