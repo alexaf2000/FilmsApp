@@ -134,6 +134,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onItemClick(View view, int position) {
-        Toast.makeText(this, "Contenido: "+filmsDataSet.get(position).get("id"), Toast.LENGTH_SHORT).show();
+        // If we pressed a film then...
+        // Creates a new intent
+        Intent intent = new Intent(this,ModifyFilmActivity.class);
+        // Put as param of the intent called id the film id
+        intent.putExtra("id",filmsDataSet.get(position).get("id"));
+        // Start the activity
+        startActivity(intent);
     }
 }
