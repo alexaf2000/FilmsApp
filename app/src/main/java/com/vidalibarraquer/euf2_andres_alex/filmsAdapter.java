@@ -12,6 +12,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,8 +53,9 @@ public class filmsAdapter extends RecyclerView.Adapter<filmsAdapter.MyViewHolder
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         HashMap<String,String> Film = DataSet.get(position);
         holder.titleText.setText(Film.get("title"));
-        holder.coverImage.setImageBitmap(null);
-        new DownloadImageTask(holder.coverImage).execute((Film.get("cover")));
+        Glide.with(holder.coverImage.getContext())
+                .load(Film.get("cover"))
+                .into(holder.coverImage);
     }
 
     @Override
