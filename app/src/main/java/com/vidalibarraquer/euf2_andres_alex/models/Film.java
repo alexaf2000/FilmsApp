@@ -1,8 +1,11 @@
 package com.vidalibarraquer.euf2_andres_alex.models;
 
 import java.net.URL;
+import java.util.UUID;
 
 public class Film {
+
+    String id;
     String title;
     String genre;
     int duration; // In minutes
@@ -15,6 +18,21 @@ public class Film {
         this.duration = duration;
         this.puntuation = puntuation;
         this.cover = cover;
+
+        // This will generate a random ID for our film
+        this.id = UUID.randomUUID().toString();
+    }
+
+    public Film() {
+
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
