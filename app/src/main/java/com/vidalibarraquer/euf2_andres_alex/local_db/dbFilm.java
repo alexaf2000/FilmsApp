@@ -11,6 +11,7 @@ import com.vidalibarraquer.euf2_andres_alex.models.Film;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,5 +109,22 @@ public class dbFilm extends SQLiteOpenHelper {
         db.close();
         return filmsList;
 
+    }
+    public List<String> getAllGenres(){
+        List<String> test = new ArrayList<>();
+        String getAllQuery ="SELECT DISTINCT "+KEY_GENRE+" FROM "+ TABLE_NAME;
+        //Let's execute the query
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.rawQuery(getAllQuery, null);
+        System.out.println(cursor.getCount());
+        if (cursor.moveToFirst()) {
+            do{
+                test.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+
+        db.close();
+        return test;
     }
 }
