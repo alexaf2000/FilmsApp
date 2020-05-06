@@ -1,11 +1,16 @@
 package com.vidalibarraquer.euf2_andres_alex;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -72,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putBoolean("storedDefaultValues", true);
             editor.commit();
 
-            // Creates multiple Film objects
+            // Creates multiple Film objects and add it to the DB
             try {
                 film_db.addFilm(new Film("Star Wars Episodio III: La venganza de los sith", "Ciencia Ficción", 160, 8, new URL("https://assets.cinepolisklic.com/cmsklicia/movieimages/star-wars-episodio-iii-la-venganza-de-los-sith/poster_originalsize_250X375.png")));
                 film_db.addFilm(new Film("Harry Potter y el prisionero de Azkaban", "Ciencia Ficción", 180, 7, new URL("https://sun6-3.userapi.com/c831109/v831109559/1c7f6a/gem24ZAlE60.jpg")));
@@ -89,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-
+        // Once ended the start let's refresh and load all the films data
         refresh();
     }
 
@@ -138,9 +143,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onItemClick(View view, int position) {
         // If we pressed a film then...
         // Creates a new intent
-        Intent intent = new Intent(this,ModifyFilmActivity.class);
+        Intent intent = new Intent(this, ModifyFilmActivity.class);
         // Put as param of the intent called id the film id
-        intent.putExtra("id",filmsDataSet.get(position).get("id"));
+        intent.putExtra("id", filmsDataSet.get(position).get("id"));
         // Start the activity
         startActivity(intent);
     }
@@ -160,8 +165,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         if (id == R.id.filterButton) {
-            Toast.makeText(this, "Let's filter something...", Toast.LENGTH_SHORT).show();
+            // Will get the list of genres
+            final List<String> StringList = film_db.getAllGenres();
+            // Convert the string array to a CharSequence (required by AlertDialog)
+            CharSequence[] cs = StringList.toArray(new CharSequence[StringList.size()]);
+            // Creates de AlertDialogBuilder
+            new AlertDialog.Builder(this)
+                    .setTitle("Filtrar por genero")
+                    .setItems(cs, new DialogInterface.OnClickListener() {
+                        // On click on genre
+                        public void onClick(DialogInterface dialog, int position) {
+                            System.out.println(StringList.get(position));
+                            // Here we need to say: GET ALL FILMS BY THIS GENRE-> StringList.get(position)
+                        }
+                    })
+                    .show();
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

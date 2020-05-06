@@ -111,20 +111,21 @@ public class dbFilm extends SQLiteOpenHelper {
 
     }
     public List<String> getAllGenres(){
-        List<String> test = new ArrayList<>();
+        List<String> list = new ArrayList<>();
+        // This query will get all genres but not repeated!
         String getAllQuery ="SELECT DISTINCT "+KEY_GENRE+" FROM "+ TABLE_NAME;
         //Let's execute the query
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor cursor = db.rawQuery(getAllQuery, null);
-        System.out.println(cursor.getCount());
+        list.add("Todas"); // Let's add a "all" category
         if (cursor.moveToFirst()) {
             do{
-                test.add(cursor.getString(0));
+                list.add(cursor.getString(0));
             } while (cursor.moveToNext());
         }
 
         db.close();
-        return test;
+        return list;
     }
 }
