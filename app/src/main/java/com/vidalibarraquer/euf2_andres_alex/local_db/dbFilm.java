@@ -39,7 +39,7 @@ public class dbFilm extends SQLiteOpenHelper {
     // Database creation
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" + KEY_ID + " TEXT PRIMARY KEY, " + KEY_TITLE + " TEXT, " + KEY_GENRE + " TEXT, " + KEY_DURATION + " INTEGER," + KEY_PUNTUATION + " INTEGER, " + KEY_COVER + " TEXT"  + ")";
+        String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" + KEY_ID + " TEXT PRIMARY KEY, " + KEY_TITLE + " TEXT, " + KEY_GENRE + " TEXT, " + KEY_DURATION + " INTEGER," + KEY_PUNTUATION + " INTEGER, " + KEY_COVER + " TEXT" + ")";
         db.execSQL(CREATE_TABLE);
 
     }
@@ -52,7 +52,7 @@ public class dbFilm extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addFilm(Film film){
+    public void addFilm(Film film) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -66,18 +66,18 @@ public class dbFilm extends SQLiteOpenHelper {
         values.put(KEY_COVER, film.getCover().toString());
 
         //Add the register into the table
-        db.insert(TABLE_NAME,null,values);
-        System.out.println("This is the context: "+ film.getCover().toString());
+        db.insert(TABLE_NAME, null, values);
+        System.out.println("This is the context: " + film.getCover().toString());
         // Close the Database connection
         db.close();
     }
 
     // Return all Films
-    public List<Film> getAllFilms()  {
+    public List<Film> getAllFilms() {
         List<Film> filmsList = new ArrayList<Film>();
 
         // Query for getting all table registers
-        String getAllQuery ="SELECT * FROM "+ TABLE_NAME;
+        String getAllQuery = "SELECT * FROM " + TABLE_NAME;
 
         //Let's execute the query
         SQLiteDatabase db = this.getWritableDatabase();
@@ -87,7 +87,7 @@ public class dbFilm extends SQLiteOpenHelper {
 
         //Cursor movement
         if (cursor.moveToFirst()) {
-            do{
+            do {
                 //Let's create the object Film
                 Film film = new Film();
                 // Let's do the correspondency with the data returned from db
@@ -108,19 +108,51 @@ public class dbFilm extends SQLiteOpenHelper {
         }
         db.close();
         return filmsList;
-
     }
-    public List<String> getAllGenres(){
+
+    public Film getFilm(String id) {
+        List<Film> filmsList = new ArrayList<Film>();
+
+        // Query for getting all table registers
+        String getOneQuery = "SELECT * FROM " + TABLE_NAME + " WHERE id='" + id +"'";
+
+        //Let's execute the query
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Saves the results on the cursor
+        Cursor cursor = db.rawQuery(getOneQuery, null);
+
+        cursor.moveToFirst();
+
+        Film film = new Film();
+        // Let's do the correspondency with the data returned from db
+        film.setId(cursor.getString(0));
+        film.setTitle(cursor.getString(1));
+        film.setGenre(cursor.getString(2));
+        film.setDuration(Integer.parseInt(cursor.getString(3)));
+        film.setPuntuation(Integer.parseInt(cursor.getString(4)));
+        try {
+            film.setCover(new URL(cursor.getString(5)));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        db.close();
+
+        return film;
+    }
+
+    public List<String> getAllGenres() {
         List<String> list = new ArrayList<>();
         // This query will get all genres but not repeated!
-        String getAllQuery ="SELECT DISTINCT "+KEY_GENRE+" FROM "+ TABLE_NAME;
+        String getAllQuery = "SELECT DISTINCT " + KEY_GENRE + " FROM " + TABLE_NAME;
         //Let's execute the query
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor cursor = db.rawQuery(getAllQuery, null);
         list.add("Todas"); // Let's add a "all" category
         if (cursor.moveToFirst()) {
-            do{
+            do {
                 list.add(cursor.getString(0));
             } while (cursor.moveToNext());
         }
