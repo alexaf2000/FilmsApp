@@ -24,7 +24,7 @@ public class Film {
     }
 
     public Film() {
-
+        this.id = UUID.randomUUID().toString();
     }
 
     public String getId() {
