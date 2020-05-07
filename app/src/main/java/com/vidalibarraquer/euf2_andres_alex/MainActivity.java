@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.vidalibarraquer.euf2_andres_alex.local_db.dbFilm;
@@ -35,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<HashMap<String, String>> filmsDataSet;
     List<Film> filmsList;
     filmsAdapter mAdapter;
+
+    SharedPreferences preferences;
+    String GenreFilter;
 
 
     @Override
@@ -62,7 +66,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         film_db = new dbFilm(MainActivity.this);
 
         // Read sharedpreferences from this app
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        GenreFilter = preferences.getString("GenreFilter", null);
+        Toast.makeText(this, GenreFilter + "", Toast.LENGTH_SHORT).show();
+
         // If not saved before default films then...
         if (preferences.getBoolean("storedDefaultValues", false) == false) {
             // Save as now the default films are inserted
@@ -108,7 +116,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void refreshData() {
-        filmsList = film_db.getAllFilms();
+        if (GenreFilter != "Todas") {
+            filmsList = film_db.getAllFilmsByGenre(GenreFilter);
+        } else {
+            filmsList = film_db.getAllFilms();
+        }
 
         HashMap<String, String> hashMap;
         filmsDataSet = new ArrayList<HashMap<String, String>>();
@@ -178,8 +190,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     .setItems(cs, new DialogInterface.OnClickListener() {
                         // On click on genre
                         public void onClick(DialogInterface dialog, int position) {
-                            System.out.println(StringList.get(position));
-                            // Here we need to say: GET ALL FILMS BY THIS GENRE-> StringList.get(position)
+                            GenreFilter = StringList.get(position);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putString("GenreFilter", GenreFilter);
+                            editor.commit();
+                            onStart();
+                            Toast.makeText(MainActivity.this, "Te has suscrito a las notificaciones de " + GenreFilter, Toast.LENGTH_LONG).show();
+
                         }
                     })
                     .show();

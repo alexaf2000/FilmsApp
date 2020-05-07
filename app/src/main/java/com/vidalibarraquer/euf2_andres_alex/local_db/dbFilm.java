@@ -72,7 +72,7 @@ public class dbFilm extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void modifyFilm(String id,Film film) {
+    public void modifyFilm(String id, Film film) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -86,16 +86,17 @@ public class dbFilm extends SQLiteOpenHelper {
 
         //Add the register into the table
 
-        db.update(TABLE_NAME,values,"id='"+id+"'",null);
+        db.update(TABLE_NAME, values, "id='" + id + "'", null);
 
         // Close the Database connection
         db.close();
     }
+
     public void removeFilm(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         //Add the register into the table
-        db.delete(TABLE_NAME,"id='"+id+"'",null);
+        db.delete(TABLE_NAME, "id='" + id + "'", null);
 
         // Close the Database connection
         db.close();
@@ -139,11 +140,48 @@ public class dbFilm extends SQLiteOpenHelper {
         return filmsList;
     }
 
+    public List<Film> getAllFilmsByGenre(String genre) {
+        List<Film> filmsList = new ArrayList<Film>();
+
+        // Query for getting all table registers
+        String getAllQuery = "SELECT * FROM " + TABLE_NAME + " WHERE genre='" + genre + "'";
+
+        //Let's execute the query
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Saves the results on the cursor
+        Cursor cursor = db.rawQuery(getAllQuery, null);
+
+        //Cursor movement
+        if (cursor.moveToFirst()) {
+            do {
+                //Let's create the object Film
+                Film film = new Film();
+                // Let's do the correspondency with the data returned from db
+                film.setId(cursor.getString(0));
+                film.setTitle(cursor.getString(1));
+                film.setGenre(cursor.getString(2));
+                film.setDuration(Integer.parseInt(cursor.getString(3)));
+                film.setPuntuation(Integer.parseInt(cursor.getString(4)));
+                try {
+                    film.setCover(new URL(cursor.getString(5)));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+                //Add to the list the object film created
+                filmsList.add(film);
+
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return filmsList;
+    }
+
     public Film getFilm(String id) {
         List<Film> filmsList = new ArrayList<Film>();
 
         // Query for getting all table registers
-        String getOneQuery = "SELECT * FROM " + TABLE_NAME + " WHERE id='" + id +"'";
+        String getOneQuery = "SELECT * FROM " + TABLE_NAME + " WHERE id='" + id + "'";
 
         //Let's execute the query
         SQLiteDatabase db = this.getWritableDatabase();
