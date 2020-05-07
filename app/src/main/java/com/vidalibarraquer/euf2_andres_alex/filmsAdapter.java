@@ -21,11 +21,11 @@ import java.util.HashMap;
 
 public class filmsAdapter extends RecyclerView.Adapter<filmsAdapter.MyViewHolder> {
 
-    private final ArrayList<HashMap<String, String>> DataSet;
+    private ArrayList<HashMap<String, String>> DataSet;
     Context context;
     private ItemClickListener mClickListener;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         public TextView titleText;
         public ImageView coverImage;
 
@@ -39,6 +39,7 @@ public class filmsAdapter extends RecyclerView.Adapter<filmsAdapter.MyViewHolder
 
 
         }
+
         @Override
         public void onClick(View v) {
             if (mClickListener != null) mClickListener.onItemClick(v, getAdapterPosition());
@@ -46,7 +47,7 @@ public class filmsAdapter extends RecyclerView.Adapter<filmsAdapter.MyViewHolder
 
         @Override
         public boolean onLongClick(View v) {
-            HashMap<String,String> Film = DataSet.get(getPosition());
+            HashMap<String, String> Film = DataSet.get(getPosition());
             Toast.makeText(context, Film.get("title"), Toast.LENGTH_SHORT).show();
             Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);
@@ -56,24 +57,29 @@ public class filmsAdapter extends RecyclerView.Adapter<filmsAdapter.MyViewHolder
         }
     }
 
-    public filmsAdapter(MainActivity context, ArrayList<HashMap<String,String>> myDataSet){
+    public filmsAdapter(MainActivity context, ArrayList<HashMap<String, String>> myDataSet) {
         // Let's get the data from outside
         DataSet = myDataSet;
 
         this.context = context;
     }
+
+    public void setItems(ArrayList<HashMap<String, String>> myDataSet) {
+        DataSet = myDataSet;
+    }
+
     @NonNull
     @Override
     public filmsAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Creates the view
-        View v =  LayoutInflater.from(parent.getContext()).inflate(R.layout.film_list_element, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.film_list_element, parent, false);
 
         return new MyViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        HashMap<String,String> Film = DataSet.get(position);
+        HashMap<String, String> Film = DataSet.get(position);
         holder.titleText.setText(Film.get("title"));
         Glide.with(holder.coverImage.getContext())
                 .load(Film.get("cover"))
@@ -89,6 +95,7 @@ public class filmsAdapter extends RecyclerView.Adapter<filmsAdapter.MyViewHolder
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
+
     // Interfícies per implementar events click
     public interface ItemClickListener {
         void onItemClick(View view, int position);

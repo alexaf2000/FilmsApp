@@ -1,26 +1,18 @@
 package com.vidalibarraquer.euf2_andres_alex;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.vidalibarraquer.euf2_andres_alex.local_db.dbFilm;
@@ -42,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     dbFilm film_db;
     ArrayList<HashMap<String, String>> filmsDataSet;
     List<Film> filmsList;
+    filmsAdapter mAdapter;
 
 
     @Override
@@ -95,10 +88,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         // Once ended the start let's refresh and load all the films data
-        refresh();
+        refreshData();
+        // Especifica el adaptador a fer servir
+        mAdapter = new filmsAdapter(MainActivity.this, filmsDataSet);
+        mAdapter.setClickListener(this);
+
+        filmsRecyclerView.setAdapter(mAdapter);
+        ;
     }
 
-    public void refresh() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        refreshData();
+
+        mAdapter.setItems(filmsDataSet);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    protected void refreshData() {
         filmsList = film_db.getAllFilms();
 
         HashMap<String, String> hashMap;
@@ -118,14 +127,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             filmsDataSet.add(hashMap);
         }
-
-        // Especifica el adaptador a fer servir
-        filmsAdapter mAdapter = new filmsAdapter(MainActivity.this, filmsDataSet);
-        mAdapter.setClickListener(this);
-
-        filmsRecyclerView.setAdapter(mAdapter);
-
     }
+
 
     @Override
     public void onClick(View v) {
