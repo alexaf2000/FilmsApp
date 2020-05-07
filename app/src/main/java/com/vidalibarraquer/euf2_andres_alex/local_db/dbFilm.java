@@ -72,6 +72,35 @@ public class dbFilm extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void modifyFilm(String id,Film film) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        // Do the correspondencies
+        values.put(KEY_TITLE, film.getTitle());
+        values.put(KEY_GENRE, film.getGenre());
+        values.put(KEY_DURATION, film.getDuration());
+        values.put(KEY_PUNTUATION, film.getPuntuation());
+        values.put(KEY_COVER, film.getCover().toString());
+
+        //Add the register into the table
+
+        db.update(TABLE_NAME,values,"id='"+id+"'",null);
+
+        // Close the Database connection
+        db.close();
+    }
+    public void removeFilm(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        //Add the register into the table
+        db.delete(TABLE_NAME,"id='"+id+"'",null);
+
+        // Close the Database connection
+        db.close();
+    }
+
     // Return all Films
     public List<Film> getAllFilms() {
         List<Film> filmsList = new ArrayList<Film>();
