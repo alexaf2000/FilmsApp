@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "377177082684",
+    "firebase_url": "https://euf2andresalex.firebaseio.com",
+    "project_id": "euf2andresalex",
+    "storage_bucket": "euf2andresalex.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377177082684:android:e8c1c10759cc588e312c39",
+        "android_client_info": {
+          "package_name": "com.vidalibarraquer.euf2_andres_alex"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "377177082684-trj3je71jmuk7a1a5d86blm2th252d6t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vidalibarraquer.euf2_andres_alex",
+            "certificate_hash": "9a00180911f326365b88c0c66beedc5d28eca68a"
+          }
+        },
+        {
+          "client_id": "377177082684-ahf6egothmgtemf8a2jkhbvrn5iqop98.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBu6AiwIpZ7yljaL_q9h17AQoN6wRZrm1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "377177082684-ahf6egothmgtemf8a2jkhbvrn5iqop98.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

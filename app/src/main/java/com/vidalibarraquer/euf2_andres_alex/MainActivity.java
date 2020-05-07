@@ -16,17 +16,18 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.vidalibarraquer.euf2_andres_alex.local_db.dbFilm;
 import com.vidalibarraquer.euf2_andres_alex.models.Film;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, filmsAdapter.ItemClickListener {
-    // Visual components assignation
 
     FloatingActionButton floatingActionButton;
     RecyclerView filmsRecyclerView;
@@ -49,29 +50,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Assign visual component to the variable
         floatingActionButton = (FloatingActionButton) findViewById(R.id.floatingActionButton);
         filmsRecyclerView = (RecyclerView) findViewById(R.id.filmsRecyclerView);
-        // Let's put a onClick Listener
+        // Let's put a onClick Listener on the floating action button
         floatingActionButton.setOnClickListener(this);
 
 
-        //Mejora el rendimiento sabiendo que el tamaño de los childs será fijo
+        //Improves the performance
         filmsRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
+        // Let's create a Layout for the recycler view (grid is better for movie covers)
         layoutManager = new GridLayoutManager(this, 3);
-
+        // Assign the created layout to the Recycler view
         filmsRecyclerView.setLayoutManager(layoutManager);
-
 
         // Let's use the db
         film_db = new dbFilm(MainActivity.this);
 
-        // Read sharedpreferences from this app
+        // Read sharedpreferences (settings saved on the phone)
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        // Get if was defined a Filter of genre on the settings
         GenreFilter = preferences.getString("GenreFilter", null);
-        Toast.makeText(this, GenreFilter + "", Toast.LENGTH_SHORT).show();
 
-        // If not saved before default films then...
+        // If not saved before some preview films  then add them...
         if (preferences.getBoolean("storedDefaultValues", false) == false) {
             // Save as now the default films are inserted
             SharedPreferences.Editor editor = preferences.edit();
@@ -94,31 +94,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
-
-        // Once ended the start let's refresh and load all the films data
-        refreshData();
-        // Especifica el adaptador a fer servir
+        // Let's create the adapter
         mAdapter = new filmsAdapter(MainActivity.this, filmsDataSet);
+
+        // The click listener when element of the recycler view is clicked
         mAdapter.setClickListener(this);
 
+        // Set the adapter for the recyclerview
         filmsRecyclerView.setAdapter(mAdapter);
-        ;
+
+        // Once ended the creation of the app let's refresh and load all the films data
+        refreshData();
     }
+
 
     @Override
     protected void onStart() {
         super.onStart();
 
+        // This method will be called if we return from other activity...
+        // so then we require to refresh the data
         refreshData();
 
+        // Let's say to the adapter that the data was modified
         mAdapter.setItems(filmsDataSet);
         mAdapter.notifyDataSetChanged();
     }
 
+
     protected void refreshData() {
-        if (GenreFilter != "Todas") {
+        // This is all the process for getting the films
+
+        // If the Filter of Genre is not null and is not "Todas" then...
+        if (GenreFilter != null && !GenreFilter.equalsIgnoreCase("Todas")) {
+            // Get all films from a single genre
             filmsList = film_db.getAllFilmsByGenre(GenreFilter);
         } else {
+            // If not was defined a Genre Filter or was "Todas" then get All
             filmsList = film_db.getAllFilms();
         }
 
@@ -131,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String cover = film.getCover().toString();
 
 
-            //Afegim la clau valor a un objecte de tipus Hashmap
+            //Do the correspondency
             hashMap = new HashMap<String, String>();
             hashMap.put("id", id);
             hashMap.put("title", title);
@@ -145,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            // On click on the floatingActionButton
             case R.id.floatingActionButton:
                 // Load AddFilm Activity
                 Intent intent = new Intent(this, AddFilmActivity.class);
@@ -165,43 +178,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(intent);
     }
 
-    // create an action bar button
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // R.menu.mymenu is a reference to an xml file named mymenu.xml which should be inside your res/menu directory.
-        // If you don't have res/menu, just create a directory named "menu" inside res
+        // This will set a actionBar menu
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
-    // handle button activities
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        // If a actionBar button was pressed...
 
-        if (id == R.id.filterButton) {
+        if (item.getItemId() == R.id.filterButton) {
+            //If the pressed button was the filter button then
+
             // Will get the list of genres
             final List<String> StringList = film_db.getAllGenres();
             // Convert the string array to a CharSequence (required by AlertDialog)
             CharSequence[] cs = StringList.toArray(new CharSequence[StringList.size()]);
-            // Creates de AlertDialogBuilder
+            // Creates a Dialog showing the genres
             new AlertDialog.Builder(this)
                     .setTitle("Filtrar por genero")
                     .setItems(cs, new DialogInterface.OnClickListener() {
                         // On click on genre
-                        public void onClick(DialogInterface dialog, int position) {
+                        public void onClick(DialogInterface dialog, int position) { //Will set as Items the genres list (cs)
+                            if (GenreFilter != null) // If was set before some Genre, then unsuscribe from it
+                                FirebaseMessaging.getInstance().unsubscribeFromTopic(stripAccents(GenreFilter.toLowerCase().replace(" ", "_")));
+                            // Let's get the selected Genre
                             GenreFilter = StringList.get(position);
                             SharedPreferences.Editor editor = preferences.edit();
+                            // Saves on the settings the genre filter
                             editor.putString("GenreFilter", GenreFilter);
                             editor.commit();
-                            onStart();
+                            // Suscribes to the firebase message (for the topic uses the category name but instead of spaces the underscore and without accents)
+                            FirebaseMessaging.getInstance().subscribeToTopic(stripAccents(GenreFilter.toLowerCase().replace(" ", "_")));
+                            // Shows a message of confirmation of the suscription
                             Toast.makeText(MainActivity.this, "Te has suscrito a las notificaciones de " + GenreFilter, Toast.LENGTH_LONG).show();
-
+                            // Calls the onStart function to reload the recyclerview
+                            onStart();
                         }
                     })
                     .show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    // A support method for remove accents from texts
+    public static String stripAccents(String s) {
+        s = Normalizer.normalize(s, Normalizer.Form.NFD);
+        s = s.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+        return s;
     }
 
 }
